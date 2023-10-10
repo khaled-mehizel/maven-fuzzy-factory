@@ -63,7 +63,15 @@ Next, we are to calculate the ID of the last session the original homepage was v
     202 / 4  is roughly 50, so we have 50 more sessions per month after switching to the new landing page!
 
 
+## Create a full conversion funnel for both landing pages in the aforementioned period.
+The conversion funnel is how far into the ordering process the session has gotten, from the browsing all the way to the thank-you page.
+To accomplish this task, we must divide the query into a few steps:
+- First, we extract the sessions in this period that landed in these two pages.
+- We add flags using **Case Pivoting** for each session, to show how far into the funnel it has gotten.
+- Based on the previous step, we categorize each session on what step in the funnel it reached.
+- We then count how many sessions reached each step of the funnel, as well as the full conversion rate, aggregated by the landing pages.
 
-
+## Analyze the revenue generated in the test conducted between Sep 10th and Nov 10th between the two billing pages.
+For this one, we extract the revenue before, during, and after the test, and measure the increase
 
 
