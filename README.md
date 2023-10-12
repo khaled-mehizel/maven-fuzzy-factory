@@ -8,9 +8,12 @@ The dataset is provided by [Maven Analytics](https://www.mavenanalytics.io). It 
 The goal of this project is to put together a data storytelling report for the board of the company, highlighting the strides that have been made in the 8 months the company has been launched, and emphasizing its rapid growth.
 Note that we are only going to analyze the data up until 2012-11-27 as that's the day we receive the email.
 
+I decided to go the extra mile and visualize it as well! 
+
 # Resources and Tools Used
 - MySQL Workbench for the querying of the data.
 - Dataset provided in the course in the form of SQL scripts.
+- PowerBI for the report building.
 
 # Importing the Dataset
 - The preparation file includes a script to change certain settings in MySQL Workbench to not break some date values, and to make the timeouts for the queries less strict just in case my PC decides to be extra slow (it did).
@@ -74,11 +77,18 @@ To accomplish this task, we must divide the query into a few steps:
 ## Analyze the revenue generated in the test conducted between Sep 10th and Nov 10th between the two billing pages.
 - We start by creating a subquery that has the needed data ready for us, the session ID, which billing page was used, the order ID and the total of the order, all in the time constraint specified by the CEO.
 - Then, we group the sessions and their totals by each billing page. We find that the new billing page has a lift of $8.5 per session.
+I actually rewrote this entire query and realized the old one was correct all along
 
 ## Calculate the revenue generated in the previous thanks to this test.
 - We count the sessions that reached the order and multiply it by the lift we discovered just now:
     
         $8.5 * 1193 = $10140.5
+
+# Visualization
+- Extracted each requirement into a CSV file, I'll connect MySQL to PBI eventually I swear.
+    - Extracted the funnel one into two for each landing page.
+- Linked a previously created calendar table.
+-
 
 
 # Recap
