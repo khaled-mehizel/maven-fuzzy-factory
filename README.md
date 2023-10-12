@@ -72,6 +72,16 @@ To accomplish this task, we must divide the query into a few steps:
 - We then count how many sessions reached each step of the funnel, as well as the full conversion rate, aggregated by the landing pages.
 
 ## Analyze the revenue generated in the test conducted between Sep 10th and Nov 10th between the two billing pages.
-For this one, we extract the revenue before, during, and after the test, and measure the increase
+- We start by creating a subquery that has the needed data ready for us, the session ID, which billing page was used, the order ID and the total of the order, all in the time constraint specified by the CEO.
+- Then, we group the sessions and their totals by each billing page. We find that the new billing page has a lift of $8.5 per session.
+
+## Calculate the revenue generated in the previous thanks to this test.
+- We count the sessions that reached the order and multiply it by the lift we discovered just now:
+    
+        $8.5 * 1193 = $10140.5
 
 
+# Recap
+- Contributed in putting together a very compelling report to the board, showcasing the growth our startup has managed, from conversion funnels to analyzing the effects of the optimization process we put together, like testing new landing and billing pages, increasing the customer's confidence in our website.
+- Emphasized the differences between the marketing channels, and the traffic sources separately, to paint a clear picture on where the money should go in terms of paid traffic and advertising campaigns.
+- Very likely to secure further funding for future endeavors, new products, new ad campaigns etc.

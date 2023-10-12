@@ -250,3 +250,37 @@ SELECT  landing_page,
 FROM session_funnel_progress
 GROUP BY landing_page;
 
+/* 8- Analyze the revenue generated in the test conducted between Sep 10th and Nov 10th between the two billing pages.
+I’d love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the test
+(Sep 10 – Nov 10), in terms of revenue per billing page session, and then pull the number of billing page sessions
+for the past month to understand monthly impact.*/
+
+SELECT pages,
+		COUNT(sessions),
+        SUM(price_usd)/COUNT(sessions) AS revenue_per_page
+FROM (SELECT wp.website_session_id AS sessions,
+	   wp.pageview_url AS pages,
+	   o.order_id,
+       o.price_usd
+FROM website_pageviews wp
+LEFT JOIN orders o
+ON o.website_session_id = wp.website_session_id
+WHERE wp.created_at > "2012-09-10"
+	AND wp.created_at < "2012-11-10"
+    AND wp.pageview_url IN ("/billing","/billing-2")) AS billing_page_and_order_info
+GROUP BY pages;
+
+/* The new billing page gets $31.33, while the old ones gets $22.83
+The lift is $8.5 more per session */
+
+-- Counting the web sessions per page in the past month
+SELECT COUNT(website_session_id) as sessions_that_reached_billing
+FROM website_pageviews
+WHERE created_at > "2012-10-27" -- past month
+	AND created_at < "2012-11-27"
+    AND pageview_url IN ("/billing","/billing-2")
+
+/* We have 1193 sessions that reached billing
+Revenue = 1193 * 8.5 = $10140.5 */ 
+
+
