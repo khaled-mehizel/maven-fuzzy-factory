@@ -1,26 +1,31 @@
+
 /* 1- Counting the number of sessions and orders per month coming from "gsearch"-------------------------------------------------------
 "Gsearch seems to be the biggest driver of our business. Could you pull monthly trends for gsearch sessions and orders so that we can showcase the growth there?-------------
 */
 
-SELECT 
+SELECT
+	YEAR(ws.created_at) AS year,
     MONTHNAME(ws.created_at) AS month,
+    MIN(DATE(ws.created_at)) AS start_of_month,
     COUNT(ws.website_session_id) AS sessions,
-    COUNT(o.order_id) AS orders
+    COUNT(o.order_id) AS orders,
+    COUNT(o.order_id)/COUNT(ws.website_session_id) AS CVR
 FROM
     website_sessions ws
         LEFT JOIN
     orders o ON o.website_session_id = ws.website_session_id
 WHERE
-    ws.utm_source = 'gsearch'
-        AND ws.created_at < '2012-11-27'
+   ws.utm_source = 'gsearch'
+   AND ws.created_at < '2012-11-27'
 GROUP BY month
-ORDER BY start_of_month;
+ORDER BY month;
 
 /* 2- Ditto but separated by campaign.
 Next, it would be great to see a similar monthly trend for Gsearch, but this time splitting out nonbrand and brand campaigns separately. I am wondering if brand is picking up at all. If so, this is a good story to tell.
 */
 
 SELECT 
+    YEAR(ws.created_at) AS year,
     MONTHNAME(ws.created_at) AS month,
     MIN(DATE(ws.created_at)) AS start_of_month,
 	COUNT(CASE WHEN ws.utm_campaign = "brand" THEN ws.website_session_id ELSE NULL END) AS branded_sessions,
@@ -44,12 +49,15 @@ While we’re on Gsearch, could you dive into nonbrand, and pull monthly session
 */
 
 SELECT 
+	YEAR(ws.created_at) AS year,
     MONTHNAME(ws.created_at) AS month,
     MIN(DATE(ws.created_at)) AS start_of_month,
 	COUNT(CASE WHEN ws.device_type = "mobile" THEN ws.website_session_id ELSE NULL END) AS mobile_sessions,
     COUNT(CASE WHEN ws.device_type = "mobile" THEN o.order_id ELSE NULL END) AS mobile_orders,
+    COUNT(CASE WHEN ws.device_type = "mobile" THEN o.order_id ELSE NULL END)/COUNT(CASE WHEN ws.device_type = "mobile" THEN ws.website_session_id ELSE NULL END) AS mobile_CVR,
     COUNT(CASE WHEN ws.device_type = "desktop" THEN ws.website_session_id ELSE NULL END) AS desktop_sessions,
     COUNT(CASE WHEN ws.device_type = "desktop" THEN o.order_id ELSE NULL END) AS desktop_orders,
+    COUNT(CASE WHEN ws.device_type = "desktop" THEN o.order_id ELSE NULL END)/COUNT(CASE WHEN ws.device_type = "desktop" THEN ws.website_session_id ELSE NULL END) AS dekstop_CVR,
     COUNT(ws.website_session_id) AS total_sessions,
     COUNT(o.order_id) AS total_orders
 FROM
@@ -74,14 +82,14 @@ SELECT DISTINCT
 FROM website_sessions;
 -- the traffic coming from bsearch and gsearch UTM sources is paid, the traffic coming from the gsearch and bsearch websites without a UTM source is search traffic, and the traffic coming directly into the site.
 SELECT 
+	YEAR(ws.created_at) AS year,
     MONTHNAME(ws.created_at) AS month,
     MIN(DATE(ws.created_at)) AS start_of_month,
-	COUNT(CASE WHEN ws.utm_source = "gsearch" THEN ws.website_session_id ELSE NULL END) AS gsearch_sessions,
-    COUNT(CASE WHEN ws.utm_source = "bsearch" THEN ws.website_session_id ELSE NULL END) AS bsearch_sessions,
-    COUNT(CASE WHEN ws.utm_source IS NULL AND http_referer IS NOT NULL THEN ws.website_session_id ELSE NULL END) AS search_sessions,
-    COUNT(CASE WHEN ws.utm_source IS NULL AND http_referer IS NULL THEN ws.website_session_id ELSE NULL END) AS direct_sessions,
-    COUNT(ws.website_session_id) AS total_sessions,
-    COUNT(CASE WHEN ws.utm_source IN ("gsearch","bsearch") THEN ws.website_session_id ELSE NULL END)/COUNT(ws.website_session_id) AS "%_of_paid_traffic"
+    -- COUNT(ws.website_session_id) AS total_sessions,
+	COUNT(CASE WHEN ws.utm_source = "gsearch" THEN ws.website_session_id ELSE NULL END)/COUNT(ws.website_session_id) AS pct_gsearch_traffic,
+    COUNT(CASE WHEN ws.utm_source = "bsearch" THEN ws.website_session_id ELSE NULL END)/COUNT(ws.website_session_id) AS pct_bsearch_traffic,
+    COUNT(CASE WHEN ws.utm_source IS NULL AND http_referer IS NOT NULL THEN ws.website_session_id ELSE NULL END)/COUNT(ws.website_session_id) AS pct_search_traffic,
+    COUNT(CASE WHEN ws.utm_source IS NULL AND http_referer IS NULL THEN ws.website_session_id ELSE NULL END)/COUNT(ws.website_session_id) AS pct_direct_traffic
 FROM
     website_sessions ws
         LEFT JOIN
@@ -95,7 +103,8 @@ ORDER BY start_of_month;
  I’d like to tell the story of our website performance improvements over the course of the first 8 months. Could you pull session to order conversion rates, by month?
 */
 
-SELECT  MONTHNAME(ws.created_at) AS month,
+SELECT  YEAR(ws.created_at) AS year,
+		MONTHNAME(ws.created_at) AS month,
 		MIN(DATE(ws.created_at)) AS start_of_month,
 		COUNT(ws.website_session_id) AS sessions, 
 		COUNT(o.order_id) AS orders,
@@ -175,80 +184,73 @@ WHERE
 For the landing page test you analyzed previously, it would be great to show a full conversion funnel from each
 of the two pages to orders. You can use the same time period you analyzed last time (Jun 19 – Jul 28). */
 
--- first we extract which landing page each session has landed on, and only take the records that satisfy the constraint set by the CEO
-
-CREATE TEMPORARY TABLE sessions_w_landing_page
-SELECT wp.pageview_url AS landing_page,
-	   sessions
-FROM
-    (SELECT 
-        ws.website_session_id AS sessions,
-		MIN(website_pageview_id) AS first_pageview
-    FROM
-        website_sessions ws
-    LEFT JOIN website_pageviews wp ON ws.website_session_id = wp.website_session_id
-    WHERE
-			ws.created_at > '2012-06-19'
-			AND ws.created_at < '2012-07-28'
-            AND wp.pageview_url IN ("/home","/lander-1")
-    GROUP BY ws.website_session_id) as sub1
-    		LEFT JOIN
-    website_pageviews wp ON sub1.first_pageview = wp.website_pageview_id
-GROUP BY 1,2;
-
 -- we create another table where we extract how far each session has gotten using flags that we added to them in a subquery
 CREATE TEMPORARY TABLE session_funnel_progress
-SELECT landing_page,
-	   sessions,
+SELECT session_id,
+	   MAX(homepage) AS saw_homepage, 
+	   MAX(new_lander) AS saw_new_lander,
        MAX(products_page) as reached_products_page,
 	   MAX(mr_fuzzy_page) as reached_mr_fuzzy_page, 
        MAX(cart_page) as reached_cart_page,
-       MAX(billing_1_page) as reached_billing_1_page,
+       MAX(billing_page) as reached_billing_page,
        MAX(shipping_page) as reached_shipping_page,
-       MAX(thanks_page) as ordered
-FROM (SELECT 
-    ws.website_session_id AS sessions,
-    wp.pageview_url AS landing_page,
-    (CASE WHEN wp.pageview_url = "/products" THEN 1 ELSE 0 END) AS products_page,
-    (CASE WHEN wp.pageview_url = "/the-original-mr-fuzzy" THEN 1 ELSE 0 END) AS mr_fuzzy_page,
-    (CASE WHEN wp.pageview_url = "/cart" THEN 1 ELSE 0 END) AS cart_page,
-    (CASE WHEN wp.pageview_url = "/billing" THEN 1 ELSE 0 END) AS billing_1_page,
-    (CASE WHEN wp.pageview_url = "/shipping" THEN 1 ELSE 0 END) AS shipping_page,
-    (CASE WHEN wp.pageview_url = "/thank-you-for-your-order" THEN 1 ELSE 0 END) AS thanks_page
-FROM
-    website_sessions ws
-        LEFT JOIN
-    website_pageviews wp ON ws.website_session_id = wp.website_session_id
-WHERE
-   ws.created_at > '2012-06-19'
-	AND ws.created_at < '2012-07-28'
-ORDER BY ws.website_session_id) as flagged_sessions
-GROUP BY sessions;
+       MAX(thankyou_page) as reached_thankyou_page
+FROM (SELECT
+	ws.website_session_id AS session_id, 
+    wp.pageview_url, 
+    CASE WHEN pageview_url = '/home' THEN 1 ELSE 0 END AS homepage,
+    CASE WHEN pageview_url = '/lander-1' THEN 1 ELSE 0 END AS new_lander,
+    CASE WHEN pageview_url = '/products' THEN 1 ELSE 0 END AS products_page,
+    CASE WHEN pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mr_fuzzy_page, 
+    CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+    CASE WHEN pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+    CASE WHEN pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+    CASE WHEN pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+FROM website_sessions ws
+	LEFT JOIN website_pageviews wp
+		ON ws.website_session_id = wp.website_session_id
+WHERE utm_source = 'gsearch' 
+	AND utm_campaign = 'nonbrand' 
+    AND ws.created_at < '2012-07-28'
+		AND ws.created_at > '2012-06-19'
+ORDER BY 
+	ws.website_session_id,
+    wp.created_at) as flagged_sessions
+GROUP BY session_id;
 
 -- Now we count how many times the sessions reached each step in the funnel:
 CREATE TEMPORARY TABLE funnel_steps_count
-SELECT  landing_page,
-		COUNT(sessions) AS session_count, 
-		COUNT(CASE WHEN reached_products_page = 1 THEN sessions ELSE NULL END) AS to_products,
-		COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN sessions ELSE NULL END) AS to_mr_fuzzy,
-		COUNT(CASE WHEN reached_cart_page = 1 THEN sessions ELSE NULL END) AS to_cart,
-		COUNT(CASE WHEN reached_shipping_page = 1 THEN sessions ELSE NULL END) AS to_shipping,
-		COUNT(CASE WHEN reached_billing_1_page = 1 THEN sessions ELSE NULL END) AS to_billing_1,
-		COUNT(CASE WHEN ordered = 1 THEN sessions ELSE NULL END) AS orders
+SELECT
+	CASE 
+		WHEN saw_homepage = 1 THEN 'saw_homepage'
+        WHEN saw_new_lander = 1 THEN 'saw_new_lander'
+        ELSE 'check logic' 
+	END AS segment, 
+    COUNT(session_id) AS sessions,
+    COUNT(CASE WHEN reached_products_page = 1 THEN session_id ELSE NULL END) AS reached_products_page,
+    COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN session_id ELSE NULL END) AS reached_mr_fuzzy,
+    COUNT(CASE WHEN reached_cart_page = 1 THEN session_id ELSE NULL END) AS reached_cart,
+    COUNT(CASE WHEN reached_shipping_page = 1 THEN session_id ELSE NULL END) AS reached_shipping,
+    COUNT(CASE WHEN reached_billing_page = 1 THEN session_id ELSE NULL END) AS reached_billing,
+    COUNT(CASE WHEN reached_thankyou_page = 1 THEN session_id ELSE NULL END) AS reached_thankyou
 FROM session_funnel_progress
-GROUP BY landing_page;
+GROUP BY 1;
 
 -- The final step is to convert the numbers into conversion rates
-SELECT  landing_page,
-		COUNT(sessions) AS session_count, 
-		COUNT(CASE WHEN reached_products_page = 1 THEN sessions ELSE NULL END)/COUNT(sessions) AS to_products_rt,
-		COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN sessions ELSE NULL END)/COUNT(CASE WHEN reached_products_page = 1 THEN sessions ELSE NULL END) AS to_mr_fuzzy_rt,
-		COUNT(CASE WHEN reached_cart_page = 1 THEN sessions ELSE NULL END)/COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN sessions ELSE NULL END) AS to_cart_rt,
-		COUNT(CASE WHEN reached_shipping_page = 1 THEN sessions ELSE NULL END)/COUNT(CASE WHEN reached_cart_page = 1 THEN sessions ELSE NULL END) AS to_shipping_rt,
-		COUNT(CASE WHEN reached_billing_1_page = 1 THEN sessions ELSE NULL END)/COUNT(CASE WHEN reached_shipping_page = 1 THEN sessions ELSE NULL END) AS to_billing_1_rt,
-		COUNT(CASE WHEN ordered = 1 THEN sessions ELSE NULL END)/COUNT(CASE WHEN reached_billing_1_page = 1 THEN sessions ELSE NULL END) AS orders_rt
+SELECT  
+		CASE 
+			WHEN saw_homepage = 1 THEN 'saw_homepage'
+			WHEN saw_new_lander = 1 THEN 'saw_new_lander'
+			ELSE 'check logic' 
+		END AS segment,
+		COUNT(CASE WHEN reached_products_page = 1 THEN session_id ELSE NULL END)/COUNT(session_id) AS lander_click_rt,
+		COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN session_id ELSE NULL END)/COUNT(CASE WHEN reached_products_page = 1 THEN session_id ELSE NULL END) AS products_click_rt,
+		COUNT(CASE WHEN reached_cart_page = 1 THEN session_id ELSE NULL END)/COUNT(CASE WHEN reached_mr_fuzzy_page = 1 THEN session_id ELSE NULL END) AS mr_fuzzy_click_rt,
+		COUNT(CASE WHEN reached_shipping_page = 1 THEN session_id ELSE NULL END)/COUNT(CASE WHEN reached_cart_page = 1 THEN session_id ELSE NULL END) AS cart_click_rt,
+		COUNT(CASE WHEN reached_billing_page = 1 THEN session_id ELSE NULL END)/COUNT(CASE WHEN reached_shipping_page = 1 THEN session_id ELSE NULL END) AS shipping_rt,
+		COUNT(CASE WHEN reached_thankyou_page = 1 THEN session_id ELSE NULL END)/COUNT(CASE WHEN reached_billing_page = 1 THEN session_id ELSE NULL END) AS billing_click_rt
 FROM session_funnel_progress
-GROUP BY landing_page;
+GROUP BY 1;
 
 /* 8- Analyze the revenue generated in the test conducted between Sep 10th and Nov 10th between the two billing pages.
 I’d love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the test
@@ -256,7 +258,7 @@ I’d love for you to quantify the impact of our billing test, as well. Please a
 for the past month to understand monthly impact.*/
 
 SELECT pages,
-		COUNT(sessions),
+		COUNT(sessions) AS sessions,
         SUM(price_usd)/COUNT(sessions) AS revenue_per_page
 FROM (SELECT wp.website_session_id AS sessions,
 	   wp.pageview_url AS pages,

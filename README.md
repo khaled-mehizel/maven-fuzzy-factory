@@ -47,7 +47,6 @@ Same query as the last one, but we'll use **Case Pivoting** with the device type
 
 ## Comparing Gsearch against each of the other channels:
 We use the **Case Pivoting** again, we put the paid traffic coming from Gsearch and Bsearch in seperate categories, as well as the traffic coming in from search engines (non paid), and the traffic coming directly into the site.
-I also added a column that calculates paid traffic vs unpaid traffic, as that's a statistic that any shareholder would want to know.
 
 ## Session to order conversion rates by month.
 The conversion rate is the rate at which the website session is successful (order), so to acquire the rate, we aggregate the numbers of sessions, orders, and the rate of orders/sessions, by month.
@@ -79,16 +78,21 @@ To accomplish this task, we must divide the query into a few steps:
 - Then, we group the sessions and their totals by each billing page. We find that the new billing page has a lift of $8.5 per session.
 I actually rewrote this entire query and realized the old one was correct all along
 
-## Calculate the revenue generated in the previous thanks to this test.
+## Calculate the revenue generated in the previous query thanks to this test.
 - We count the sessions that reached the order and multiply it by the lift we discovered just now:
     
         $8.5 * 1193 = $10140.5
+
+# Data Modeling
+- Extracted all the relevant tables until 2012-11-27.
+- Created relationships between the queried data and the lookup tables.
 
 # Visualization
 - Extracted each requirement into a CSV file, I'll connect MySQL to PBI eventually I swear.
     - Extracted the funnel one into two for each landing page.
 - Linked a previously created calendar table.
--
+- Linked the funnels, **unpivoted** them, and made two conversion funnel visuals, one for each homepage.
+
 
 
 # Recap
