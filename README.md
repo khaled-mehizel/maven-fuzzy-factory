@@ -92,6 +92,7 @@ I actually rewrote this entire query and realized the old one was correct all al
     - Extracted the funnel one into two for each landing page.
 - Linked a previously created calendar table.
 - Linked the funnels, **unpivoted** them, and made two conversion funnel visuals, one for each homepage.
+- Sorting the axes in Power BI is so unbelievable backwards and unintuitive, it's incredible, but I made it work!
 
 
 
