@@ -93,10 +93,15 @@ I actually rewrote this entire query and realized the old one was correct all al
 - Linked a previously created calendar table.
 - Linked the funnels, **unpivoted** them, and made two conversion funnel visuals, one for each homepage.
 - Sorting the axes in Power BI is so unbelievable backwards and unintuitive, it's incredible, but I made it work!
-
+    - Choosing the sorting column in Data View seemingly does nothing, so you have to select the field in the Build-a-Visual pane, select the field you want, the sorting column for it, AND THEN choose what to sort with the axis with on the drop-down menu at the top of the visual! It is 2023, this is terrible design
+- Since there is no double funnel in Power BI, I used two funnels for each page and removed the step label on the second one, it's a hack job, but it works.
+- Added different line visualizations to show the monthly changes in the conversion rates, numbers of sessions, and numbers of orders based on the CEO's request.
+- Kept the calculations at the start static due to the purposes of this report.
+- Used a line chart to highlight how the other traffic sources are starting to acquire more traction from GSearch.
 
 
 # Recap
 - Contributed in putting together a very compelling report to the board, showcasing the growth our startup has managed, from conversion funnels to analyzing the effects of the optimization process we put together, like testing new landing and billing pages, increasing the customer's confidence in our website.
 - Emphasized the differences between the marketing channels, and the traffic sources separately, to paint a clear picture on where the money should go in terms of paid traffic and advertising campaigns.
+- Effectively displayed the fruits of all the labor over the first months of the startup's life, from tweaking the landing and billing pages, as well as adjusting the marketing channels.
 - Very likely to secure further funding for future endeavors, new products, new ad campaigns etc.
