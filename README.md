@@ -5,7 +5,7 @@
 
 The dataset is provided by [Maven Analytics](https://www.mavenanalytics.io). It covers the products and performance of an ecommerce startup.
 
-The goal of this project is to put together a data storytelling report for the board of the company, highlighting the strides that have been made in the 8 months the company has been launched, and emphasizing its rapid growth.
+The goal of this project is to put together a data storytelling report for the board of the company, highlighting the strides that have been made in the 8 months the company has been launched, and emphasizing its rapid growth. As well as showcase the steps taken to improve the website in general.
 Note that we are only going to analyze the data up until 2012-11-27 as that's the day we receive the email.
 
 I decided to go the extra mile and visualize it as well! 
