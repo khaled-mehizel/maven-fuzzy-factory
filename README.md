@@ -1,4 +1,4 @@
-# maven-fuzzy-market
+# Maven Fuzzy Market Marketing/Web Analysis and Report
  DB Analysis as part of Maven Analytics' Advanced MySQL course.
 
  The course has the user play the role of a database analyst in a startup ecommerce company named Maven Fuzzy Factory. Responsibilities include optimizing market channels, measuring the impact of new product launches, and generally helping steer the startup to grow as quickly as possible.
@@ -105,3 +105,7 @@ I actually rewrote this entire query and realized the old one was correct all al
 - Emphasized the differences between the marketing channels, and the traffic sources separately, to paint a clear picture on where the money should go in terms of paid traffic and advertising campaigns.
 - Effectively displayed the fruits of all the labor over the first months of the startup's life, from tweaking the landing and billing pages, as well as adjusting the marketing channels.
 - Very likely to secure further funding for future endeavors, new products, new ad campaigns etc.
+
+# My thoughts
+This is why I want to work in data for life. This field genuinely interests me, and I love the tools that I can use with it. I think that the website data analysis is quite a different ballgame than HR or Business analyses but I still enjoyed it all the same. <br>
+What I also enjoyed very much is seeing the company improve as a result of my and many others' contribution, that was very exciting for me.
