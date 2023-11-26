@@ -90,7 +90,7 @@ I actually rewrote this entire query and realized the old one was correct all al
 # Visualization
 - Extracted each requirement into a CSV file, I'll connect MySQL to PBI eventually I swear.
     - Extracted the funnel one into two for each landing page.
-- Linked a previously created calendar table.
+- Linked a previously created calendar table **CALENDAR()**.
 - Linked the funnels, **unpivoted** them, and made two conversion funnel visuals, one for each homepage.
 - Sorting the axes in Power BI is so unbelievable backwards and unintuitive, it's incredible, but I made it work!
     - Choosing the sorting column in Data View seemingly does nothing, so you have to select the field in the Build-a-Visual pane, select the field you want, the sorting column for it, AND THEN choose what to sort with the axis with on the drop-down menu at the top of the visual! It is 2023, this is terrible design
