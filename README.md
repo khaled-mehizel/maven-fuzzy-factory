@@ -13,7 +13,9 @@ I decided to go the extra mile and visualize it as well!
 # Resources and Tools Used
 - MySQL Workbench for the querying of the data.
 - Dataset provided in the course in the form of SQL scripts.
-- PowerBI for the report building.
+- PowerBI for the visualization and building of the dashboard.
+- PowerPoint to write the report.
+
 
 # Importing the Dataset
 - The preparation file includes a script to change certain settings in MySQL Workbench to not break some date values, and to make the timeouts for the queries less strict just in case my PC decides to be extra slow (it did).
@@ -99,6 +101,8 @@ I actually rewrote this entire query and realized the old one was correct all al
 - Kept the calculations at the start static due to the purposes of this report.
 - Used a line chart to highlight how the other traffic sources are starting to acquire more traction from GSearch.
 
+# Report
+- Take a look at the report [here](https://pdfhost.io/v/r6MWQ~~.A_Maven_Fuzzy_Market_EndofYear_Report)
 
 # Recap
 - Contributed in putting together a very compelling report to the board, showcasing the growth our startup has managed, from conversion funnels to analyzing the effects of the optimization process we put together, like testing new landing and billing pages, increasing the customer's confidence in our website.
