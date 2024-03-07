@@ -5,10 +5,15 @@
 
 The dataset is provided by [Maven Analytics](https://www.mavenanalytics.io). It covers the products and performance of an ecommerce startup.
 
+# Updates
+- **March 7th 2024**:
+    - Overhauled the dashboard completely, got rid of old visuals that were bad, modernized others like the new card visual and DAX visual calculations, as well as a new color palette.
+# Goal 
 The goal of this project is to put together a data storytelling report for the board of the company, highlighting the strides that have been made in the 8 months the company has been launched, and emphasizing its rapid growth. As well as showcase the steps taken to improve the website in general.
 Note that we are only going to analyze the data up until 2012-11-27 as that's the day we receive the email.
 
-I decided to go the extra mile and visualize it as well! 
+I decided to go the extra mile and visualize it as well!
+
 
 # Resources and Tools Used
 - MySQL Workbench for the querying of the data.
@@ -63,7 +68,7 @@ Next, we are to calculate the ID of the last session the original homepage was v
 
  The increase of sessions since then (until the 27th of November as stated in the first section), and after some quick math we find that we now get 50 more sessions per months!
 
-    The difference in CVR was 0.0088, so multiplying it by 22972 gives us about 202 since Jul 28th, so about 4 months
+    The difference in CVR was 8.8%, so multiplying it by 22972 gives us about 202 since Jul 28th, so about 4 months
     202 / 4  is roughly 50, so we have 50 more sessions per month after switching to the new landing page!
 
 
@@ -92,14 +97,27 @@ I actually rewrote this entire query and realized the old one was correct all al
 # Visualization
 - Extracted each requirement into a CSV file, I'll connect MySQL to PBI eventually I swear.
     - Extracted the funnel one into two for each landing page.
-- Linked a previously created calendar table **CALENDAR()**.
+- Created a calendar table using the **CALENDAR()** DAX function.
 - Linked the funnels, **unpivoted** them, and made two conversion funnel visuals, one for each homepage.
 - Sorting the axes in Power BI is so unbelievable backwards and unintuitive, it's incredible, but I made it work!
-    - Choosing the sorting column in Data View seemingly does nothing, so you have to select the field in the Build-a-Visual pane, select the field you want, the sorting column for it, AND THEN choose what to sort with the axis with on the drop-down menu at the top of the visual! It is 2023, this is terrible design
+    - Choosing the sorting column in Data View seemingly does nothing, so you have to select the field in the Build-a-Visual pane, select the field you want, the sorting column for it, AND THEN choose what to sort with the axis with on the drop-down menu at the top of the visual! It is 2023, this is terrible design.
+- Created DAX measures that highlight current Conversion Rate, session count, and order count, as well as the same metrics for the previous month, as well as **Visual Calculations** (Godsend).
+    ```
+    Current Conversion Rate = CALCULATE(
+                                        SUM('MFM Global trends'[CVR]),
+                                        FILTER('Calendar','Calendar'[Month_Num] = MAX('Calendar'[Month_Num])))
+
+- Used the new card visual (oh my God it's so good) alongside some KPI cards to highlight the aforementioned metrics.
+    - First card a little sparkline made through a line chart that stripped of its axes.
+    !["picture of the card"](Report/CVR%20sparkline.PNG)
+- Added a line chart showing the improvements in the conversion rate over time.
 - Since there is no double funnel in Power BI, I used two funnels for each page and removed the step label on the second one, it's a hack job, but it works.
-- Added different line visualizations to show the monthly changes in the conversion rates, numbers of sessions, and numbers of orders based on the CEO's request.
-- Kept the calculations at the start static due to the purposes of this report.
-- Used a line chart to highlight how the other traffic sources are starting to acquire more traction from GSearch.
+![Conversion funnel ](Report/Conversion%20Funnel.png)
+-  Used a stacked line chart to highlight the different search engines (and lack thereof) used by the customers to enter the website.
+- Added two bar-line combo charts:
+    - First one highlights the differences between Branded and Non-Branded marketing in terms of Session Count and Conversion Rate.
+    - Second one highlights the differences between Desktop and Mobile traffic, also in terms of Session Count and Conversion Rate.
+
 
 # Report
 - Take a look at the report [here](https://pdfhost.io/v/r6MWQ~~.A_Maven_Fuzzy_Market_EndofYear_Report)
